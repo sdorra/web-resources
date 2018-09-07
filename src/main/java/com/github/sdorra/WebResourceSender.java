@@ -49,8 +49,9 @@ public final class WebResourceSender {
 
             // If-None-Match header should contain "*" or ETag. If so, then return 304.
             String ifNoneMatch = request.getHeader("If-None-Match");
-            if (ifNoneMatch != null && matches(ifNoneMatch, resource.getETag())) {
-                response.setHeader("ETag", resource.getETag().get()); // Required in 304.
+            Optional<String> eTag = resource.getETag();
+            if (ifNoneMatch != null && matches(ifNoneMatch, eTag)) {
+                response.setHeader("ETag", eTag.get()); // Required in 304.
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 return;
             }
@@ -68,7 +69,7 @@ public final class WebResourceSender {
 
             // If-Match header should contain "*" or ETag. If not, then return 412.
             String ifMatch = request.getHeader("If-Match");
-            if (ifMatch != null && !matches(ifMatch, resource.getETag())) {
+            if (ifMatch != null && !matches(ifMatch, eTag)) {
                 response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return;
             }
