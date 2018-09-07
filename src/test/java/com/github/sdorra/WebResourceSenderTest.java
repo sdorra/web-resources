@@ -144,6 +144,21 @@ class WebResourceSenderTest {
     }
 
     @Test
+    void testCopyContentWithGZIPButWithoutAcceptHeader() throws IOException {
+        when(resource.getContent()).thenReturn(inputStream("hello"));
+        try (CapturingOutputStream output = new CapturingOutputStream()) {
+            when(response.getOutputStream()).thenReturn(output);
+
+            WebResourceSender.create()
+                    .withGZIP()
+                    .resource(resource)
+                    .send(request, response);
+
+            assertThat(output.getValue()).isEqualTo("hello");
+        }
+    }
+
+    @Test
     void testCopyContentWithBufferSize() throws IOException {
         when(resource.getContent()).thenReturn(inputStream("hello"));
         try (CapturingOutputStream output = new CapturingOutputStream()) {
@@ -160,6 +175,7 @@ class WebResourceSenderTest {
 
     @Test
     void testGZipCompression() throws IOException {
+        when(request.getHeader("Accept-Encoding")).thenReturn("gzip");
         when(resource.getContent()).thenReturn(inputStream("hello"));
 
         try (CapturingOutputStream output = new CapturingOutputStream()) {
@@ -297,7 +313,7 @@ class WebResourceSenderTest {
             buffer.write(b);
         }
 
-        public String getValue() {
+        String getValue() {
             return buffer.toString();
         }
 

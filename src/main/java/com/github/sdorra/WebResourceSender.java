@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.zip.GZIPOutputStream;
 
@@ -103,11 +104,27 @@ public final class WebResourceSender {
             response.setStatus(HttpServletResponse.SC_OK);
             sendHeaders(response);
 
-            if (gzip) {
+            if (isGZIPEnabled(request)) {
                 sendContentCompressed(resource, response);
             } else {
                 sendContent(resource, response);
             }
+        }
+
+        private boolean isGZIPEnabled(HttpServletRequest request) {
+            if (gzip) {
+                String acceptEncoding = request.getHeader("Accept-Encoding");
+                return acceptEncoding != null && accepts(acceptEncoding, "gzip");
+            }
+            return false;
+        }
+
+        private boolean accepts(String acceptHeader, String toAccept) {
+            String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
+            Arrays.sort(acceptValues);
+            return Arrays.binarySearch(acceptValues, toAccept) > -1
+                    || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
+                    || Arrays.binarySearch(acceptValues, "*/*") > -1;
         }
 
         private void sendContentCompressed(WebResource resource, HttpServletResponse response) throws IOException {
