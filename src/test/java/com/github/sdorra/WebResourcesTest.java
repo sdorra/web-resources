@@ -61,7 +61,12 @@ class WebResourcesTest {
         URL url = new URL(String.format("jar:file:%s!/%s", jarPath.toString(), "test.txt"));
         WebResource resource = WebResources.of(url);
 
-        verifyPath(resource, path);
+
+        assertThat(resource.getContentType()).contains("text/plain");
+        assertThat(resource.getContentLength()).contains(Files.size(path));
+        assertThat(toString(resource.getContent())).isEqualTo("awesome");
+        assertThat(resource.getETag()).contains(WebResources.etag(path));
+        assertThat(resource.getLastModifiedDate()).contains(Files.getLastModifiedTime(jarPath).toInstant());
     }
 
 
