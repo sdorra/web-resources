@@ -18,6 +18,7 @@ public final class WebResourceSender {
     private static final int BUFFER_SIZE = 8192;
 
     private boolean gzip = false;
+    private int bufferSize = BUFFER_SIZE;
 
     private WebResourceSender(){}
 
@@ -27,6 +28,14 @@ public final class WebResourceSender {
 
     public WebResourceSender withGZIP() {
         gzip = true;
+        return this;
+    }
+
+    public WebResourceSender withBufferSize(int bufferSize) {
+        if (bufferSize <= 0) {
+            throw new IllegalArgumentException("buffer size must be greater than zero");
+        }
+        this.bufferSize = bufferSize;
         return this;
     }
 
@@ -109,7 +118,7 @@ public final class WebResourceSender {
         }
 
         private GZIPOutputStream gzipOutputStream(HttpServletResponse response) throws IOException {
-            return new GZIPOutputStream(response.getOutputStream(), BUFFER_SIZE);
+            return new GZIPOutputStream(response.getOutputStream(), bufferSize);
         }
 
         private void sendContent(WebResource resource, HttpServletResponse response) throws IOException {
@@ -121,7 +130,7 @@ public final class WebResourceSender {
 
         private long copy(InputStream source, OutputStream sink) throws IOException {
             long nread = 0L;
-            byte[] buf = new byte[BUFFER_SIZE];
+            byte[] buf = new byte[bufferSize];
             int n;
             while ((n = source.read(buf)) > 0) {
                 sink.write(buf, 0, n);

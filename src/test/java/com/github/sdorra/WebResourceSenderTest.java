@@ -144,6 +144,21 @@ class WebResourceSenderTest {
     }
 
     @Test
+    void testCopyContentWithBufferSize() throws IOException {
+        when(resource.getContent()).thenReturn(inputStream("hello"));
+        try (CapturingOutputStream output = new CapturingOutputStream()) {
+            when(response.getOutputStream()).thenReturn(output);
+
+            WebResourceSender.create()
+                    .withBufferSize(16)
+                    .resource(resource)
+                    .send(request, response);
+
+            assertThat(output.getValue()).isEqualTo("hello");
+        }
+    }
+
+    @Test
     void testGZipCompression() throws IOException {
         when(resource.getContent()).thenReturn(inputStream("hello"));
 
