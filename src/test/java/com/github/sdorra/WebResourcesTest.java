@@ -4,10 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,7 +51,7 @@ class WebResourcesTest {
             JarEntry entry = new JarEntry("test.txt");
             output.putNextEntry(entry);
             try (InputStream input = Files.newInputStream(path)) {
-                copy(input, output);
+                Streams.copy(input, output);
             }
             output.closeEntry();
         }
@@ -64,7 +62,7 @@ class WebResourcesTest {
 
         assertThat(resource.getContentType()).contains("text/plain");
         assertThat(resource.getContentLength()).contains(Files.size(path));
-        assertThat(toString(resource.getContent())).isEqualTo("awesome");
+        assertThat(Streams.toString(resource.getContent())).isEqualTo("awesome");
         assertThat(resource.getETag()).contains(WebResources.etag(path));
         assertThat(resource.getLastModifiedDate()).contains(Files.getLastModifiedTime(jarPath).toInstant());
     }
@@ -74,22 +72,8 @@ class WebResourcesTest {
         assertThat(resource.getContentType()).contains("text/plain");
         assertThat(resource.getLastModifiedDate()).contains(Files.getLastModifiedTime(path).toInstant());
         assertThat(resource.getContentLength()).contains(Files.size(path));
-        assertThat(toString(resource.getContent())).isEqualTo("awesome");
+        assertThat(Streams.toString(resource.getContent())).isEqualTo("awesome");
         assertThat(resource.getETag()).contains(WebResources.etag(path));
-    }
-
-    private String toString(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        copy(inputStream, output);
-        return output.toString("UTF-8");
-    }
-
-    private void copy(InputStream source, OutputStream sink) throws IOException {
-        byte[] buf = new byte[8192];
-        int n;
-        while ((n = source.read(buf)) > 0) {
-            sink.write(buf, 0, n);
-        }
     }
 
     private Path createSamplePath(@TempDirectory.TempDir Path tempDir) throws IOException {

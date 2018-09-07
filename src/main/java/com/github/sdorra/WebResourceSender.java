@@ -11,13 +11,23 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.zip.GZIPOutputStream;
 
 public final class WebResourceSender {
+
+    private static final int BUFFER_SIZE = 8192;
+
+    private boolean gzip = false;
 
     private WebResourceSender(){}
 
     public static WebResourceSender create() {
         return new WebResourceSender();
+    }
+
+    public WebResourceSender withGZIP() {
+        gzip = true;
+        return this;
     }
 
     public Sender resource(Path path) throws IOException {
@@ -83,12 +93,31 @@ public final class WebResourceSender {
 
             response.setStatus(HttpServletResponse.SC_OK);
             sendHeaders(response);
-            try (InputStream source = resource.getContent(); OutputStream sink = response.getOutputStream()) {
+
+            if (gzip) {
+                sendContentCompressed(resource, response);
+            } else {
+                sendContent(resource, response);
+            }
+        }
+
+        private void sendContentCompressed(WebResource resource, HttpServletResponse response) throws IOException {
+            response.setHeader("Content-Encoding", "gzip");
+            try (InputStream source = resource.getContent(); OutputStream sink = gzipOutputStream(response)) {
                 copy(source, sink);
             }
         }
 
-        private static final int BUFFER_SIZE = 8192;
+        private GZIPOutputStream gzipOutputStream(HttpServletResponse response) throws IOException {
+            return new GZIPOutputStream(response.getOutputStream(), BUFFER_SIZE);
+        }
+
+        private void sendContent(WebResource resource, HttpServletResponse response) throws IOException {
+            setLongHeader(response, "Content-Length", resource.getContentLength());
+            try (InputStream source = resource.getContent(); OutputStream sink = response.getOutputStream()) {
+                copy(source, sink);
+            }
+        }
 
         private long copy(InputStream source, OutputStream sink) throws IOException {
             long nread = 0L;
@@ -127,7 +156,6 @@ public final class WebResourceSender {
 
         private void sendHeaders(HttpServletResponse response) {
             setHeader(response, "Content-Type", resource.getContentType());
-            setLongHeader(response, "Content-Length", resource.getContentLength());
             setDateHeader(response, "Last-Modified", resource.getLastModifiedDate());
             setHeader(response, "ETag", resource.getETag());
         }

@@ -24,6 +24,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.zip.GZIPInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -139,6 +140,34 @@ class WebResourceSenderTest {
                     .send(request, response);
 
             assertThat(output.getValue()).isEqualTo("hello");
+        }
+    }
+
+    @Test
+    void testGZipCompression() throws IOException {
+        when(resource.getContent()).thenReturn(inputStream("hello"));
+
+        try (CapturingOutputStream output = new CapturingOutputStream()) {
+            when(response.getOutputStream()).thenReturn(output);
+
+            WebResourceSender.create()
+                    .withGZIP()
+                    .resource(resource)
+                    .send(request, response);
+
+            verify(response).setHeader("Content-Encoding", "gzip");
+            String content = readGZIP(output.buffer.toByteArray());
+            assertThat(content).isEqualTo("hello");
+        }
+    }
+
+    private String readGZIP(byte[] data) throws IOException {
+        try (InputStream input = new GZIPInputStream(new ByteArrayInputStream(data))) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            Streams.copy(input, baos);
+
+            return baos.toString("UTF-8");
         }
     }
 
