@@ -6,10 +6,12 @@ import com.github.sdorra.spotter.ContentTypes;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -17,13 +19,36 @@ public final class WebResources {
 
     private WebResources(){}
 
-    public static WebResource of(URL url)  throws IOException {
+    public static WebResource of(URL url) throws IOException {
+        if ("file".equals(url.getProtocol())) {
+            try {
+                return of(Paths.get(url.toURI()));
+            } catch (URISyntaxException ex) {
+                throw new IOException("failed to get path from uri", ex);
+            }
+        }
+
         URLConnection connection = url.openConnection();
+        String name = name(url);
+        long size = connection.getContentLengthLong();
+        long lastModified = connection.getLastModified();
+
+
         return builder(() -> url.openConnection().getInputStream())
-                .withContentLength(connection.getContentLengthLong())
-                .withLastModifiedDate(connection.getLastModified())
+                .withContentLength(size)
+                .withLastModifiedDate(lastModified)
                 .withContentType(ContentTypes.detect(url.getPath()))
+                .withETag(etag(name, size, lastModified))
                 .build();
+    }
+
+    private static String name(URL url) {
+        String path = url.getPath();
+        int index = path.lastIndexOf('/');
+        if (index > 0) {
+            return path.substring(index + 1);
+        }
+        return path;
     }
 
     public static WebResource of(File file) throws IOException {
@@ -35,11 +60,23 @@ public final class WebResources {
                 .withContentLength(Files.size(path))
                 .withLastModifiedDate(Files.getLastModifiedTime(path).toInstant())
                 .withContentType(ContentTypes.detect(path.toString()))
+                .withETag(etag(path))
                 .build();
     }
 
     public static Builder builder(ContentProvider contentProvider) {
         return new Builder(contentProvider);
+    }
+
+    static String etag(Path path) throws IOException {
+        String name = path.getFileName().toString();
+        long size = Files.size(path);
+        long lastModified = Files.getLastModifiedTime(path).toMillis();
+        return etag(name, size, lastModified);
+    }
+
+    private static String etag(String name, long size, long lastModifid) {
+        return String.format("%s_%s_%s", name, size, lastModifid);
     }
 
     public static class Builder {
@@ -51,7 +88,9 @@ public final class WebResources {
         }
 
         public Builder withContentLength(Long length) {
-            resource.contentLength = length;
+            if (length != null && length >= 0) {
+                resource.contentLength = length;
+            }
             return this;
         }
 
