@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 public final class WebResourceSender {
@@ -20,6 +21,7 @@ public final class WebResourceSender {
 
     private boolean gzip = false;
     private int bufferSize = BUFFER_SIZE;
+    private long expires = -1;
 
     private WebResourceSender(){}
 
@@ -37,6 +39,18 @@ public final class WebResourceSender {
             throw new IllegalArgumentException("buffer size must be greater than zero");
         }
         this.bufferSize = bufferSize;
+        return this;
+    }
+
+    public WebResourceSender withExpires(long count, TimeUnit unit) {
+        if (count <= 0) {
+            throw new IllegalArgumentException("count must be greater than zero");
+        }
+
+        if (unit == null) {
+            throw new IllegalArgumentException("time unit is required");
+        }
+        this.expires = unit.toMillis(count);
         return this;
     }
 
@@ -204,6 +218,10 @@ public final class WebResourceSender {
             response.setHeader("Content-Type", contentType);
             setDateHeader(response, "Last-Modified", resource.getLastModifiedDate());
             setHeader(response, "ETag", resource.getETag());
+
+            if (expires > 0) {
+                response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+            }
         }
 
         private String getContentDispositionHeader(HttpServletRequest request, String contentType) {

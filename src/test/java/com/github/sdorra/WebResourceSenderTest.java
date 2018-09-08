@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -24,6 +25,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -329,6 +331,35 @@ class WebResourceSenderTest {
                     .send(request, response);
 
             verify(response).setHeader("Content-Disposition", "inline;filename=\"hello.png\"");
+        }
+
+        @Test
+        void testExpires() throws IOException {
+            WebResourceSender.create()
+                    .withExpires(1, TimeUnit.HOURS)
+                    .resource(resource)
+                    .send(request, response);
+
+            ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class);
+            verify(response).setDateHeader(anyString(), captor.capture());
+
+            long time = captor.getValue();
+
+            long min = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(59l);
+            long max = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(61l);
+            assertThat(time).isBetween(min, max);
+        }
+
+        @Test
+        void testExpiresWithInvalidCount() {
+            assertThrows(IllegalArgumentException.class, () -> WebResourceSender.create()
+                    .withExpires(-1, TimeUnit.HOURS));
+        }
+
+        @Test
+        void testExpiresWithoutUnit() {
+            assertThrows(IllegalArgumentException.class, () -> WebResourceSender.create()
+                    .withExpires(3, null));
         }
 
     }
