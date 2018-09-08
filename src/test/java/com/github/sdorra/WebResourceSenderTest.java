@@ -27,9 +27,8 @@ import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith({MockitoExtension.class, TempDirectory.class})
@@ -199,6 +198,11 @@ class WebResourceSenderTest {
 
             assertThat(output.getValue()).isEqualTo("hello");
         }
+    }
+
+    @Test
+    void testWithInvalidBufferSize() {
+        assertThrows(IllegalArgumentException.class, () -> WebResourceSender.create().withBufferSize(-1));
     }
 
     @Test
