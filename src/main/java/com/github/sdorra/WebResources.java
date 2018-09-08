@@ -1,8 +1,5 @@
 package com.github.sdorra;
 
-import com.github.sdorra.spotter.ContentType;
-import com.github.sdorra.spotter.ContentTypes;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +34,7 @@ public final class WebResources {
         return builder(() -> url.openConnection().getInputStream())
                 .withContentLength(size)
                 .withLastModifiedDate(lastModified)
-                .withContentType(ContentTypes.detect(url.getPath()))
+                .withContentType(ContentTypeResolver.resolve(url.getPath()))
                 .withETag(etag(name, size, lastModified))
                 .build();
     }
@@ -59,7 +56,7 @@ public final class WebResources {
         return builder(() -> Files.newInputStream(path))
                 .withContentLength(Files.size(path))
                 .withLastModifiedDate(Files.getLastModifiedTime(path).toInstant())
-                .withContentType(ContentTypes.detect(path.toString()))
+                .withContentType(ContentTypeResolver.resolve(path.toString()))
                 .withETag(etag(path))
                 .build();
     }
@@ -91,11 +88,6 @@ public final class WebResources {
             if (length != null && length >= 0) {
                 resource.contentLength = length;
             }
-            return this;
-        }
-
-        public Builder withContentType(ContentType contentType) {
-            resource.contentType = contentType.getRaw();
             return this;
         }
 
