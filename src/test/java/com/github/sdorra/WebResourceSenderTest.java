@@ -226,6 +226,34 @@ class WebResourceSenderTest {
         }
     }
 
+    @Test
+    void testContentWithEnabledGZIPonImage() throws IOException {
+       verifyNonCompressed("image/png");
+    }
+
+    @Test
+    void testContentWithEnabledGZIPonVideo() throws IOException {
+        verifyNonCompressed("video/avi");
+    }
+
+    private void verifyNonCompressed(String contentType) throws IOException {
+        when(request.getHeader("Accept-Encoding")).thenReturn("gzip");
+        when(resource.getContentType()).thenReturn(Optional.of(contentType));
+        when(resource.getContent()).thenReturn(inputStream("hello"));
+
+        try (CapturingOutputStream output = new CapturingOutputStream()) {
+            when(response.getOutputStream()).thenReturn(output);
+
+            WebResourceSender.create()
+                    .withGZIP()
+                    .resource(resource)
+                    .send(request, response);
+
+            verify(response, never()).setHeader("Content-Encoding", "gzip");
+            assertThat(output.getValue()).isEqualTo("hello");
+        }
+    }
+
     private String readGZIP(byte[] data) throws IOException {
         try (InputStream input = new GZIPInputStream(new ByteArrayInputStream(data))) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

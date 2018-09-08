@@ -73,9 +73,16 @@ public final class WebResourceSender {
     public final class Sender {
 
         private final WebResource resource;
+        private final String contentType;
 
         private Sender(WebResource resource) {
             this.resource = resource;
+            contentType = getContentType();
+        }
+
+        private String getContentType() {
+            Optional<String> optional = resource.getContentType();
+            return optional.orElseGet(() -> ContentTypeResolver.resolve(resource.getName()));
         }
 
         public void send(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -145,10 +152,18 @@ public final class WebResourceSender {
 
         private boolean isGZIPEnabled(HttpServletRequest request) {
             if (gzip) {
-                String acceptEncoding = request.getHeader("Accept-Encoding");
-                return acceptEncoding != null && accepts(acceptEncoding, "gzip");
+                return isGZIPSupported(request) && isContentCompressable();
             }
             return false;
+        }
+
+        private boolean isGZIPSupported(HttpServletRequest request) {
+            String acceptEncoding = request.getHeader("Accept-Encoding");
+            return acceptEncoding != null && accepts(acceptEncoding, "gzip");
+        }
+
+        private boolean isContentCompressable() {
+            return !contentType.startsWith("image") && !contentType.startsWith("video");
         }
 
         private boolean accepts(String acceptHeader, String toAccept) {
@@ -213,8 +228,7 @@ public final class WebResourceSender {
         }
 
         private void sendHeaders(HttpServletRequest request, HttpServletResponse response) {
-            String contentType = getContentType();
-            response.setHeader("Content-Disposition", getContentDispositionHeader(request, contentType));
+            response.setHeader("Content-Disposition", getContentDispositionHeader(request));
             response.setHeader("Content-Type", contentType);
             setDateHeader(response, "Last-Modified", resource.getLastModifiedDate());
             setHeader(response, "ETag", resource.getETag());
@@ -224,7 +238,7 @@ public final class WebResourceSender {
             }
         }
 
-        private String getContentDispositionHeader(HttpServletRequest request, String contentType) {
+        private String getContentDispositionHeader(HttpServletRequest request) {
             String disposition = "inline";
 
             String acceptHeader = request.getHeader("Accept");
@@ -232,11 +246,6 @@ public final class WebResourceSender {
                 disposition = "attachment";
             }
             return String.format("%s;filename=\"%s\"", disposition, resource.getName());
-        }
-
-        private String getContentType() {
-            Optional<String> contentType = resource.getContentType();
-            return contentType.orElseGet(() -> ContentTypeResolver.resolve(resource.getName()));
         }
 
         private void setHeader(HttpServletResponse response, String name, Optional<String> value) {
