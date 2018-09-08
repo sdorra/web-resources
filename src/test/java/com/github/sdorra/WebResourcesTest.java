@@ -69,6 +69,7 @@ class WebResourcesTest {
 
 
     private void verifyPath(WebResource resource, Path path) throws IOException {
+        assertThat(resource.getName()).isEqualTo("test.txt");
         assertThat(resource.getContentType()).contains("text/plain");
         assertThat(resource.getLastModifiedDate()).contains(Files.getLastModifiedTime(path).toInstant());
         assertThat(resource.getContentLength()).contains(Files.size(path));

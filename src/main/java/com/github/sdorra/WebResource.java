@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public interface WebResource {
 
+    String getName();
+
     InputStream getContent() throws IOException;
 
     Optional<Long> getContentLength();

@@ -31,7 +31,7 @@ public final class WebResources {
         long lastModified = connection.getLastModified();
 
 
-        return builder(() -> url.openConnection().getInputStream())
+        return builder(name, () -> url.openConnection().getInputStream())
                 .withContentLength(size)
                 .withLastModifiedDate(lastModified)
                 .withContentType(ContentTypeResolver.resolve(url.getPath()))
@@ -53,7 +53,8 @@ public final class WebResources {
     }
 
     public static WebResource of(Path path) throws IOException {
-        return builder(() -> Files.newInputStream(path))
+        String name = path.getFileName().toString();
+        return builder(name, () -> Files.newInputStream(path))
                 .withContentLength(Files.size(path))
                 .withLastModifiedDate(Files.getLastModifiedTime(path).toInstant())
                 .withContentType(ContentTypeResolver.resolve(path.toString()))
@@ -61,8 +62,8 @@ public final class WebResources {
                 .build();
     }
 
-    public static Builder builder(ContentProvider contentProvider) {
-        return new Builder(contentProvider);
+    public static Builder builder(String name, ContentProvider contentProvider) {
+        return new Builder(name, contentProvider);
     }
 
     static String etag(Path path) throws IOException {
@@ -80,8 +81,8 @@ public final class WebResources {
 
         private final WebResourceImpl resource;
 
-        private Builder(ContentProvider contentProvider) {
-            this.resource = new WebResourceImpl(contentProvider);
+        private Builder(String name, ContentProvider contentProvider) {
+            this.resource = new WebResourceImpl(name, contentProvider);
         }
 
         public Builder withContentLength(Long length) {
@@ -121,14 +122,21 @@ public final class WebResources {
 
     private static class WebResourceImpl implements WebResource {
 
+        private final String name;
         private final ContentProvider provider;
         private Long contentLength;
         private String contentType;
         private String etag;
         private Instant lastModifiedDate;
 
-        private WebResourceImpl(ContentProvider provider) {
+        private WebResourceImpl(String name, ContentProvider provider) {
+            this.name = name;
             this.provider = provider;
+        }
+
+        @Override
+        public String getName() {
+            return name;
         }
 
         @Override
