@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -130,6 +131,28 @@ class WebResourceSenderTest {
     }
 
     @Test
+    void testHttpMethodHead() throws IOException {
+        when(request.getMethod()).thenReturn("HEAD");
+
+        WebResourceSender.create()
+                .resource(resource)
+                .send(request, response);
+
+        verify(response, never()).getOutputStream();
+    }
+
+    @Test
+    void testHead() throws IOException {
+        when(request.getMethod()).thenReturn("HEAD");
+
+        WebResourceSender.create()
+                .resource(resource)
+                .head(request, response);
+
+        verify(response, never()).getOutputStream();
+    }
+
+    @Test
     void testCopyContent() throws IOException {
         when(resource.getContent()).thenReturn(inputStream("hello"));
         try (CapturingOutputStream output = new CapturingOutputStream()) {
@@ -137,7 +160,7 @@ class WebResourceSenderTest {
 
             WebResourceSender.create()
                     .resource(resource)
-                    .send(request, response);
+                    .get(request, response);
 
             assertThat(output.getValue()).isEqualTo("hello");
         }

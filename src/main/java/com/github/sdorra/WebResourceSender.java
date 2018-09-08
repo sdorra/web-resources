@@ -65,6 +65,22 @@ public final class WebResourceSender {
         }
 
         public void send(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            process(request, response, !isHeadRequest(request));
+        }
+
+        public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            process(request, response, true);
+        }
+
+        public void head(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            process(request, response, false);
+        }
+
+        private boolean isHeadRequest(HttpServletRequest request) {
+            return "HEAD".equalsIgnoreCase(request.getMethod());
+        }
+
+        private void process(HttpServletRequest request, HttpServletResponse response, boolean content) throws IOException {
             // Validate request headers for caching ---------------------------------------------------
 
             // If-None-Match header should contain "*" or ETag. If so, then return 304.
@@ -104,10 +120,12 @@ public final class WebResourceSender {
             response.setStatus(HttpServletResponse.SC_OK);
             sendHeaders(response);
 
-            if (isGZIPEnabled(request)) {
-                sendContentCompressed(resource, response);
-            } else {
-                sendContent(resource, response);
+            if (content) {
+                if (isGZIPEnabled(request)) {
+                    sendContentCompressed(resource, response);
+                } else {
+                    sendContent(resource, response);
+                }
             }
         }
 
