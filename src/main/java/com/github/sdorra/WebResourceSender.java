@@ -118,7 +118,7 @@ public final class WebResourceSender {
             }
 
             response.setStatus(HttpServletResponse.SC_OK);
-            sendHeaders(response);
+            sendHeaders(request, response);
 
             if (content) {
                 if (isGZIPEnabled(request)) {
@@ -198,10 +198,22 @@ public final class WebResourceSender {
             return false;
         }
 
-        private void sendHeaders(HttpServletResponse response) {
-            response.setHeader("Content-Type", getContentType());
+        private void sendHeaders(HttpServletRequest request, HttpServletResponse response) {
+            String contentType = getContentType();
+            response.setHeader("Content-Disposition", getContentDispositionHeader(request, contentType));
+            response.setHeader("Content-Type", contentType);
             setDateHeader(response, "Last-Modified", resource.getLastModifiedDate());
             setHeader(response, "ETag", resource.getETag());
+        }
+
+        private String getContentDispositionHeader(HttpServletRequest request, String contentType) {
+            String disposition = "inline";
+
+            String acceptHeader = request.getHeader("Accept");
+            if (contentType.startsWith("image") && ! (acceptHeader != null && accepts(acceptHeader, contentType))) {
+                disposition = "attachment";
+            }
+            return String.format("%s;filename=\"%s\"", disposition, resource.getName());
         }
 
         private String getContentType() {

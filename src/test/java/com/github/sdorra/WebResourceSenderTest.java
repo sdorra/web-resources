@@ -51,15 +51,6 @@ class WebResourceSenderTest {
     }
 
     @Test
-    void testContentTypeForResourceWithoutContentType() throws IOException {
-        WebResourceSender.create()
-                .resource(resource)
-                .head(request, response);
-
-        verify(response).setHeader("Content-Type", "text/plain");
-    }
-
-    @Test
     void testMatchIfModifiedSince() throws IOException {
         Instant instant = Instant.now();
         long epochMilli = instant.truncatedTo(ChronoUnit.SECONDS).toEpochMilli();
@@ -248,6 +239,15 @@ class WebResourceSenderTest {
         }
 
         @Test
+        void testContentTypeForResourceWithoutContentType() throws IOException {
+            WebResourceSender.create()
+                    .resource(resource)
+                    .head(request, response);
+
+            verify(response).setHeader("Content-Type", "text/plain");
+        }
+
+        @Test
         void testETagHeader() throws IOException {
             when(resource.getETag()).thenReturn(Optional.of("abc"));
 
@@ -272,13 +272,13 @@ class WebResourceSenderTest {
 
         @Test
         void testContentTypeHeader() throws IOException {
-            when(resource.getContentType()).thenReturn(Optional.of("text/plain"));
+            when(resource.getContentType()).thenReturn(Optional.of("image/jpeg"));
 
             WebResourceSender.create()
                     .resource(resource)
                     .send(request, response);
 
-            verify(response).setHeader("Content-Type", "text/plain");
+            verify(response).setHeader("Content-Type", "image/jpeg");
         }
 
         @Test
@@ -290,6 +290,41 @@ class WebResourceSenderTest {
                     .send(request, response);
 
             verify(response).setHeader("Content-Length", "42");
+        }
+
+        @Test
+        void testContentDispositionHeader() throws IOException {
+            WebResourceSender.create()
+                    .resource(resource)
+                    .send(request, response);
+
+            verify(response).setHeader("Content-Disposition", "inline;filename=\"hello.txt\"");
+        }
+
+        @Test
+        void testContentDispositionHeaderForImage() throws IOException {
+            when(resource.getName()).thenReturn("hello.png");
+            when(resource.getContentType()).thenReturn(Optional.of("image/png"));
+
+            WebResourceSender.create()
+                    .resource(resource)
+                    .send(request, response);
+
+            verify(response).setHeader("Content-Disposition", "attachment;filename=\"hello.png\"");
+        }
+
+        @Test
+        void testContentDispositionHeaderForImageWhichIsAcceptedByTheBrowser() throws IOException {
+            when(resource.getName()).thenReturn("hello.png");
+            when(resource.getContentType()).thenReturn(Optional.of("image/png"));
+
+            when(request.getHeader("Accept")).thenReturn("image/png");
+
+            WebResourceSender.create()
+                    .resource(resource)
+                    .send(request, response);
+
+            verify(response).setHeader("Content-Disposition", "inline;filename=\"hello.png\"");
         }
 
     }
