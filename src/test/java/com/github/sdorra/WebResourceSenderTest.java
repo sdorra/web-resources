@@ -45,6 +45,20 @@ class WebResourceSenderTest {
     @Mock
     private WebResource resource;
 
+    @BeforeEach
+    void before() {
+        when(resource.getName()).thenReturn("hello.txt");
+    }
+
+    @Test
+    void testContentTypeForResourceWithoutContentType() throws IOException {
+        WebResourceSender.create()
+                .resource(resource)
+                .head(request, response);
+
+        verify(response).setHeader("Content-Type", "text/plain");
+    }
+
     @Test
     void testMatchIfModifiedSince() throws IOException {
         Instant instant = Instant.now();

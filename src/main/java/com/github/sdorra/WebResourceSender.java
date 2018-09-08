@@ -199,9 +199,14 @@ public final class WebResourceSender {
         }
 
         private void sendHeaders(HttpServletResponse response) {
-            setHeader(response, "Content-Type", resource.getContentType());
+            response.setHeader("Content-Type", getContentType());
             setDateHeader(response, "Last-Modified", resource.getLastModifiedDate());
             setHeader(response, "ETag", resource.getETag());
+        }
+
+        private String getContentType() {
+            Optional<String> contentType = resource.getContentType();
+            return contentType.orElseGet(() -> ContentTypeResolver.resolve(resource.getName()));
         }
 
         private void setHeader(HttpServletResponse response, String name, Optional<String> value) {
