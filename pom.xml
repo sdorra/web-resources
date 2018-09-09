@@ -31,6 +31,7 @@
     <artifactId>web-resources</artifactId>
     <version>1.0.1-SNAPSHOT</version>
     <name>Web Resources</name>
+    <url>https://github.com/sdorra/web-resources</url>
     <description>Sending web resources the right way</description>
 
     <inceptionYear>2018</inceptionYear>
@@ -63,6 +64,11 @@
         <system>github</system>
         <url>https://github.com/sdorra/web-resources/issues</url>
     </issueManagement>
+
+    <ciManagement>
+        <system>travis</system>
+        <url>https://travis-ci.org/sdorra/web-resources</url>
+    </ciManagement>
 
     <dependencies>
 
@@ -191,6 +197,44 @@
                         <version>1</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <configuration>
+                    <useStandardDocletOptions>true</useStandardDocletOptions>
+                    <charset>${project.build.sourceEncoding}</charset>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <docencoding>${project.build.sourceEncoding}</docencoding>
+                    <breakiterator>true</breakiterator>
+                    <version>true</version>
+                    <author>true</author>
+                    <keywords>true</keywords>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
