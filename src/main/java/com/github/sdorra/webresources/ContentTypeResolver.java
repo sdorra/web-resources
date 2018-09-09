@@ -68,7 +68,11 @@ public abstract class ContentTypeResolver {
      * @return content type
      */
     static String resolve(String filename) {
-        return instance.detect(filename);
+        String contentType = instance.detect(filename);
+        if (contentType != null) {
+            return contentType;
+        }
+        return "application/octet-stream";
     }
 
     /**

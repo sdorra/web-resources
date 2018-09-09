@@ -45,6 +45,7 @@ public final class WebResourceSender {
     private static final int BUFFER_SIZE = 8192;
 
     private boolean gzip = false;
+    private long gzipMinLength = -1;
     private int bufferSize = BUFFER_SIZE;
     private long expires = -1;
 
@@ -101,6 +102,19 @@ public final class WebResourceSender {
             throw new IllegalArgumentException("time unit is required");
         }
         this.expires = unit.toMillis(count);
+        return this;
+    }
+
+    /**
+     * Sets the minimum required content length for gzip compression.
+     * Requires enabled gzip compression with {@code #withGZIP}.
+     *
+     * @param minLength required minimum content length
+     *
+     * @return {@code this}
+     */
+    public WebResourceSender withGZIPMinLength(long minLength) {
+        this.gzipMinLength = minLength;
         return this;
     }
 
@@ -264,9 +278,19 @@ public final class WebResourceSender {
 
         private boolean isGZIPEnabled(HttpServletRequest request) {
             if (gzip) {
-                return isGZIPSupported(request) && isContentCompressable();
+                return isGZIPSupported(request)
+                        && isContentCompressable()
+                        && isGZIPRequiredMinLength();
             }
             return false;
+        }
+
+        private boolean isGZIPRequiredMinLength() {
+            Optional<Long> contentLength = resource.getContentLength();
+            if ( contentLength.isPresent() && gzipMinLength > 0) {
+                return contentLength.get() > gzipMinLength;
+            }
+            return true;
         }
 
         private boolean isGZIPSupported(HttpServletRequest request) {

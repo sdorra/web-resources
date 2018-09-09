@@ -249,6 +249,26 @@ class WebResourceSenderTest {
     }
 
     @Test
+    void testDisabledGZipCompressionForSmallFiles() throws IOException {
+        when(request.getHeader("Accept-Encoding")).thenReturn("gzip");
+        when(resource.getContentLength()).thenReturn(Optional.of(5L));
+        when(resource.getContent()).thenReturn(inputStream("hello"));
+
+        try (CapturingOutputStream output = new CapturingOutputStream()) {
+            when(response.getOutputStream()).thenReturn(output);
+
+            WebResourceSender.create()
+                    .withGZIP()
+                    .withGZIPMinLength(10L)
+                    .resource(resource)
+                    .send(request, response);
+
+            verify(response, never()).setHeader("Content-Encoding", "gzip");
+            assertThat(output.getValue()).isEqualTo("hello");
+        }
+    }
+
+    @Test
     void testContentWithEnabledGZIPonImage() throws IOException {
        verifyNonCompressed("image/png");
     }
