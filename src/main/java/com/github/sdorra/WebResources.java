@@ -49,7 +49,7 @@ public final class WebResources {
      *
      * @return web resource
      *
-     * @throws IOException
+     * @throws IOException if web resource could not be created
      */
     public static WebResource of(URL url) throws IOException {
         if ("file".equals(url.getProtocol())) {
@@ -89,7 +89,7 @@ public final class WebResources {
      *
      * @return web resource
      *
-     * @throws IOException
+     * @throws IOException if web resource could not be created
      */
     public static WebResource of(File file) throws IOException {
         return of(file.toPath());
@@ -102,7 +102,7 @@ public final class WebResources {
      *
      * @return web resource
      *
-     * @throws IOException
+     * @throws IOException if web resource could not be created
      */
     public static WebResource of(Path path) throws IOException {
         String name = path.getFileName().toString();
@@ -134,7 +134,7 @@ public final class WebResources {
      *
      * @return etag
      *
-     * @throws IOException
+     * @throws IOException If an input or output exception occurs
      */
     static String etag(Path path) throws IOException {
         String name = path.getFileName().toString();

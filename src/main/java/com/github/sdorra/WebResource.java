@@ -45,7 +45,7 @@ public interface WebResource {
      *
      * @return input stream of content
      *
-     * @throws IOException
+     * @throws IOException If an input or output exception occurs
      */
     InputStream getContent() throws IOException;
 

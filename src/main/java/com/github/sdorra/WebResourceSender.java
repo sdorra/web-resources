@@ -111,7 +111,7 @@ public final class WebResourceSender {
      *
      * @return sender
      *
-     * @throws IOException
+     * @throws IOException if web resource could not be created
      */
     public Sender resource(Path path) throws IOException {
         return resource(WebResources.of(path));
@@ -124,7 +124,7 @@ public final class WebResourceSender {
      *
      * @return sender
      *
-     * @throws IOException
+     * @throws IOException if web resource could not be created
      */
     public Sender resource(File file) throws IOException {
         return resource(WebResources.of(file));
@@ -137,7 +137,7 @@ public final class WebResourceSender {
      *
      * @return sender
      *
-     * @throws IOException
+     * @throws IOException if web resource could not be created
      */
     public Sender resource(URL url) throws IOException {
         return resource(WebResources.of(url));
@@ -149,8 +149,6 @@ public final class WebResourceSender {
      * @param webResource web resource
      *
      * @return sender
-     *
-     * @throws IOException
      */
     public Sender resource(WebResource webResource) {
         return new Sender(webResource);
@@ -181,7 +179,7 @@ public final class WebResourceSender {
          * @param request http servlet request
          * @param response http servlet response
          *
-         * @throws IOException
+         * @throws IOException If an input or output exception occurs
          */
         public void send(HttpServletRequest request, HttpServletResponse response) throws IOException {
             process(request, response, !isHeadRequest(request));
@@ -193,7 +191,7 @@ public final class WebResourceSender {
          * @param request http servlet request
          * @param response http servlet response
          *
-         * @throws IOException
+         * @throws IOException If an input or output exception occurs
          */
         public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
             process(request, response, true);
@@ -205,7 +203,7 @@ public final class WebResourceSender {
          * @param request http servlet request
          * @param response http servlet response
          *
-         * @throws IOException
+         * @throws IOException If an input or output exception occurs
          */
         public void head(HttpServletRequest request, HttpServletResponse response) throws IOException {
             process(request, response, false);
