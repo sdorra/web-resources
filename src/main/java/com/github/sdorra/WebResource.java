@@ -27,18 +27,54 @@ import java.io.InputStream;
 import java.time.Instant;
 import java.util.Optional;
 
+/**
+ * {@link WebResource} is a resource which could be send by the {@link WebResourceSender}.
+ * To create a {@link WebResource} one of the methods of {@link WebResources} should be used.
+ */
 public interface WebResource {
 
+    /**
+     * Returns the name of the resource.
+     *
+     * @return name
+     */
     String getName();
 
+    /**
+     * Returns the content of the resource as input stream.
+     *
+     * @return input stream of content
+     *
+     * @throws IOException
+     */
     InputStream getContent() throws IOException;
 
+    /**
+     * Returns optional content length
+     *
+     * @return optional content length
+     */
     Optional<Long> getContentLength();
 
+    /**
+     * Returns optional content type
+     *
+     * @return optional content type
+     */
     Optional<String> getContentType();
 
+    /**
+     * Returns optional etag
+     *
+     * @return optional etag
+     */
     Optional<String> getETag();
 
+    /**
+     * Returns optional last modified date
+     *
+     * @return optional last modified date
+     */
     Optional<Instant> getLastModifiedDate();
 
 }

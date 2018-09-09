@@ -34,10 +34,23 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Optional;
 
+/**
+ * {@link WebResources} provides util methods to create {@link WebResource}.
+ */
 public final class WebResources {
 
     private WebResources(){}
 
+    /**
+     * Creates a {@link WebResource} from a {@link URL}, if the url is a file url {@link #of(Path)} is internally used.
+     * Warning: This method should not be used with an external url.
+     *
+     * @param url source url
+     *
+     * @return web resource
+     *
+     * @throws IOException
+     */
     public static WebResource of(URL url) throws IOException {
         if ("file".equals(url.getProtocol())) {
             try {
@@ -51,7 +64,6 @@ public final class WebResources {
         String name = name(url);
         long size = connection.getContentLengthLong();
         long lastModified = connection.getLastModified();
-
 
         return builder(name, () -> url.openConnection().getInputStream())
                 .withContentLength(size)
@@ -70,10 +82,28 @@ public final class WebResources {
         return path;
     }
 
+    /**
+     * Creates a {@link WebResource} from a file.
+     *
+     * @param file source file
+     *
+     * @return web resource
+     *
+     * @throws IOException
+     */
     public static WebResource of(File file) throws IOException {
         return of(file.toPath());
     }
 
+    /**
+     * Creates a {@link WebResource} from a path.
+     *
+     * @param path source path
+     *
+     * @return web resource
+     *
+     * @throws IOException
+     */
     public static WebResource of(Path path) throws IOException {
         String name = path.getFileName().toString();
         return builder(name, () -> Files.newInputStream(path))
@@ -84,10 +114,28 @@ public final class WebResources {
                 .build();
     }
 
+    /**
+     * Creates builder for a {@link WebResource}.
+     *
+     * @param name name of the resource
+     * @param contentProvider content provider
+     *
+     * @return web resource builder
+     */
     public static Builder builder(String name, Provider<InputStream, IOException> contentProvider) {
         return new Builder(name, contentProvider);
     }
 
+    /**
+     * Creates an etag from the given file path.
+     * Note: This method is only visible for testing
+     *
+     * @param path file path
+     *
+     * @return etag
+     *
+     * @throws IOException
+     */
     static String etag(Path path) throws IOException {
         String name = path.getFileName().toString();
         long size = Files.size(path);
@@ -99,6 +147,9 @@ public final class WebResources {
         return String.format("%s_%s_%s", name, size, lastModifid);
     }
 
+    /**
+     * Web resource builder.
+     */
     public static class Builder {
 
         private final WebResourceImpl resource;
@@ -107,6 +158,13 @@ public final class WebResources {
             this.resource = new WebResourceImpl(name, contentProvider);
         }
 
+        /**
+         * Sets length of web resource content.
+         *
+         * @param length content length
+         *
+         * @return {@code this}
+         */
         public Builder withContentLength(Long length) {
             if (length != null && length >= 0) {
                 resource.contentLength = length;
@@ -114,16 +172,37 @@ public final class WebResources {
             return this;
         }
 
+        /**
+         * Sets the content type of the web resource.
+         *
+         * @param contentType content type
+         *
+         * @return {@code this}
+         */
         public Builder withContentType(String contentType) {
             resource.contentType = contentType;
             return this;
         }
 
+        /**
+         * Sets the etag of the web resource.
+         *
+         * @param etag etag of resource
+         *
+         * @return {@code this}
+         */
         public Builder withETag(String etag) {
             resource.etag = etag;
             return this;
         }
 
+        /**
+         * Sets the last modified date of the web resource.
+         *
+         * @param lastModifiedDate in milliseconds
+         *
+         * @return {@code this}
+         */
         public Builder withLastModifiedDate(long lastModifiedDate) {
             if (lastModifiedDate != -1) {
                 resource.lastModifiedDate = Instant.ofEpochMilli(lastModifiedDate);
@@ -131,11 +210,23 @@ public final class WebResources {
             return this;
         }
 
+        /**
+         * Sets the last modified date of the web resource.
+         *
+         * @param lastModifiedDate last modified date
+         *
+         * @return {@code this}
+         */
         public Builder withLastModifiedDate(Instant lastModifiedDate) {
             resource.lastModifiedDate = lastModifiedDate;
             return this;
         }
 
+        /**
+         * Creates web resource.
+         *
+         * @return web resource
+         */
         public WebResource build() {
             return resource;
         }

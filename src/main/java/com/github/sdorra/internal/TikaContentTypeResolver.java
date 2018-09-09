@@ -25,6 +25,11 @@ package com.github.sdorra.internal;
 import com.github.sdorra.ContentTypeResolver;
 import org.apache.tika.Tika;
 
+/**
+ * {@link ContentTypeResolver} which apache tika.
+ *
+ * @see <a href="https://tika.apache.org/">Apache Tika</a>
+ */
 public class TikaContentTypeResolver extends ContentTypeResolver {
 
     private final Tika tika = new Tika();

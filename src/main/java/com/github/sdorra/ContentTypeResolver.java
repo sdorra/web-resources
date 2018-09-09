@@ -22,6 +22,11 @@
  */
 package com.github.sdorra;
 
+/**
+ * Detects the content type of a path. The {@link ContentTypeResolver} uses the spotter library, if it is on the
+ * classpath. If spotter could not be found, the resolver tries to use apache tika. If spotter and tika could not be
+ * found, the {@link java.net.FileNameMap} of the jdk is used.
+ */
 public abstract class ContentTypeResolver {
 
     private static ContentTypeResolver instance;
@@ -55,10 +60,24 @@ public abstract class ContentTypeResolver {
 
     protected ContentTypeResolver() { }
 
-    static String resolve(String name) {
-        return instance.detect(name);
+    /**
+     * Resolves the content type of the filename.
+     *
+     * @param filename name of file or path
+     *
+     * @return content type
+     */
+    static String resolve(String filename) {
+        return instance.detect(filename);
     }
 
-    public abstract String detect(String name);
+    /**
+     * Detects the content type of the filename. This method should not be used, use {@link #resolve(String)} instead.
+     *
+     * @param filename name of file or path
+     *
+     * @return content type
+     */
+    public abstract String detect(String filename);
 
 }

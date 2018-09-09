@@ -37,6 +37,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * Serves {@link WebResource} over http, using the servlet api.
+ */
 public final class WebResourceSender {
 
     private static final int BUFFER_SIZE = 8192;
@@ -47,15 +50,32 @@ public final class WebResourceSender {
 
     private WebResourceSender(){}
 
+    /**
+     * Creates new {@link WebResourceSender}.
+     *
+     * @return new web resource sender
+     */
     public static WebResourceSender create() {
         return new WebResourceSender();
     }
 
+    /**
+     * Enables gzip compression.
+     *
+     * @return {@code this}
+     */
     public WebResourceSender withGZIP() {
         gzip = true;
         return this;
     }
 
+    /**
+     * Sets the size of used buffers.
+     *
+     * @param bufferSize size of buffer
+     *
+     * @return {@code this}
+     */
     public WebResourceSender withBufferSize(int bufferSize) {
         if (bufferSize <= 0) {
             throw new IllegalArgumentException("buffer size must be greater than zero");
@@ -64,6 +84,14 @@ public final class WebResourceSender {
         return this;
     }
 
+    /**
+     * Sets the default expiration date for the resources.
+     *
+     * @param count count
+     * @param unit time unit
+     *
+     * @return {@code this}
+     */
     public WebResourceSender withExpires(long count, TimeUnit unit) {
         if (count <= 0) {
             throw new IllegalArgumentException("count must be greater than zero");
@@ -76,22 +104,61 @@ public final class WebResourceSender {
         return this;
     }
 
+    /**
+     * Creates a {@link WebResource} for the path and calls {@link #resource(WebResource)}.
+     *
+     * @param path path
+     *
+     * @return sender
+     *
+     * @throws IOException
+     */
     public Sender resource(Path path) throws IOException {
         return resource(WebResources.of(path));
     }
 
+    /**
+     * Creates a {@link WebResource} for the file and calls {@link #resource(WebResource)}.
+     *
+     * @param file path
+     *
+     * @return sender
+     *
+     * @throws IOException
+     */
     public Sender resource(File file) throws IOException {
         return resource(WebResources.of(file));
     }
 
+    /**
+     * Creates a {@link WebResource} for the url and calls {@link #resource(WebResource)}.
+     *
+     * @param url url
+     *
+     * @return sender
+     *
+     * @throws IOException
+     */
     public Sender resource(URL url) throws IOException {
         return resource(WebResources.of(url));
     }
 
+    /**
+     * Creates sender for the given web resource.
+     *
+     * @param webResource web resource
+     *
+     * @return sender
+     *
+     * @throws IOException
+     */
     public Sender resource(WebResource webResource) {
         return new Sender(webResource);
     }
 
+    /**
+     * Sends a web resource to client using the servlet api.
+     */
     public final class Sender {
 
         private final WebResource resource;
@@ -107,14 +174,39 @@ public final class WebResourceSender {
             return optional.orElseGet(() -> ContentTypeResolver.resolve(resource.getName()));
         }
 
+        /**
+         * Sends the resource to the client. The methods will check the request method, if the request method is head
+         * the resource will be send without content.
+         *
+         * @param request http servlet request
+         * @param response http servlet response
+         *
+         * @throws IOException
+         */
         public void send(HttpServletRequest request, HttpServletResponse response) throws IOException {
             process(request, response, !isHeadRequest(request));
         }
 
+        /**
+         * Sends the resource to the client with content.
+         *
+         * @param request http servlet request
+         * @param response http servlet response
+         *
+         * @throws IOException
+         */
         public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
             process(request, response, true);
         }
 
+        /**
+         * Sends the resource to the client without content.
+         *
+         * @param request http servlet request
+         * @param response http servlet response
+         *
+         * @throws IOException
+         */
         public void head(HttpServletRequest request, HttpServletResponse response) throws IOException {
             process(request, response, false);
         }

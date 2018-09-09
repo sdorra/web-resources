@@ -28,6 +28,9 @@ import com.github.sdorra.ContentTypeResolver;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 
+/**
+ * {@link ContentTypeResolver} which uses {@link FileNameMap} of the jdk.
+ */
 public class JDKContentTypeResolver extends ContentTypeResolver {
     @Override
     public String detect(String name) {
