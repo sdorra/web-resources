@@ -20,13 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra.internal;
 
-import com.github.sdorra.ContentTypeResolver;
-
-class SpotterContentTypeResolverTest extends ContentTypeResolverTestBase {
-    @Override
-    ContentTypeResolver create() {
-        return new SpotterContentTypeResolver();
-    }
-}
+/**
+ * Main api package for web-resources.
+ */
+package com.github.sdorra.webresources;

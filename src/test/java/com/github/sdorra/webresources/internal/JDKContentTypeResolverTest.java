@@ -20,19 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra;
+package com.github.sdorra.webresources.internal;
 
-import org.junit.jupiter.api.Test;
+import com.github.sdorra.webresources.ContentTypeResolver;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
-class ContentTypeResolverTest {
-
-    @Test
-    public void testResolve() {
-        String type = ContentTypeResolver.resolve("hello.txt");
-        assertThat(type).isEqualTo("text/plain");
+class JDKContentTypeResolverTest extends ContentTypeResolverTestBase {
+    @Override
+    ContentTypeResolver create() {
+        return new JDKContentTypeResolver();
     }
-
 }

@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra;
+package com.github.sdorra.webresources;
 
 /**
  * Detects the content type of a path. The {@link ContentTypeResolver} uses the spotter library, if it is on the
@@ -33,11 +33,11 @@ public abstract class ContentTypeResolver {
 
     static {
         if (exists("com.github.sdorra.spotter.ContentTypes")) {
-            instance = create("com.github.sdorra.internal.SpotterContentTypeResolver");
+            instance = create("com.github.sdorra.webresources.internal.SpotterContentTypeResolver");
         } else if (exists("")) {
-            instance = create("com.github.sdorra.internal.TikaContentTypeResolver");
+            instance = create("com.github.sdorra.webresources.internal.TikaContentTypeResolver");
         } else {
-            instance = create("com.github.sdorra.internal.JDKContentTypeResolver");
+            instance = create("com.github.sdorra.webresources.internal.JDKContentTypeResolver");
         }
     }
 

@@ -20,19 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra.internal;
+package com.github.sdorra.webresources.internal;
 
-import com.github.sdorra.ContentTypeResolver;
-import com.github.sdorra.spotter.ContentTypes;
+import com.github.sdorra.webresources.ContentTypeResolver;
 
-/**
- * {@link ContentTypeResolver} which uses the spotter library.
- *
- * @see <a href="https://github.com/sdorra/spotter">Spotter</a>
- */
-public class SpotterContentTypeResolver extends ContentTypeResolver {
+class SpotterContentTypeResolverTest extends ContentTypeResolverTestBase {
     @Override
-    public String detect(String name) {
-        return ContentTypes.detect(name).getRaw();
+    ContentTypeResolver create() {
+        return new SpotterContentTypeResolver();
     }
 }

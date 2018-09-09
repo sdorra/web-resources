@@ -20,25 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra.internal;
 
-import com.github.sdorra.ContentTypeResolver;
-import org.junit.jupiter.api.Test;
+package com.github.sdorra.webresources.internal;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.github.sdorra.webresources.ContentTypeResolver;
 
-abstract class ContentTypeResolverTestBase {
+import java.net.FileNameMap;
+import java.net.URLConnection;
 
-    abstract ContentTypeResolver create();
-
-    @Test
-    public void testText() {
-        assertThat(create().detect("hello.txt")).isEqualTo("text/plain");
+/**
+ * {@link ContentTypeResolver} which uses {@link FileNameMap} of the jdk.
+ */
+public class JDKContentTypeResolver extends ContentTypeResolver {
+    @Override
+    public String detect(String name) {
+        FileNameMap fileNameMap = URLConnection.getFileNameMap();
+        return fileNameMap.getContentTypeFor(name);
     }
-
-    @Test
-    public void testImage() {
-        assertThat(create().detect("hello.jpg")).isEqualTo("image/jpeg");
-    }
-
 }

@@ -20,22 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra.internal;
+package com.github.sdorra.webresources;
 
-import com.github.sdorra.ContentTypeResolver;
-import org.apache.tika.Tika;
+import com.github.sdorra.webresources.ContentTypeResolver;
+import org.junit.jupiter.api.Test;
 
-/**
- * {@link ContentTypeResolver} which apache tika.
- *
- * @see <a href="https://tika.apache.org/">Apache Tika</a>
- */
-public class TikaContentTypeResolver extends ContentTypeResolver {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    private final Tika tika = new Tika();
 
-    @Override
-    public String detect(String name) {
-        return tika.detect(name);
+class ContentTypeResolverTest {
+
+    @Test
+    public void testResolve() {
+        String type = ContentTypeResolver.resolve("hello.txt");
+        assertThat(type).isEqualTo("text/plain");
     }
+
 }

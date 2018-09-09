@@ -22,6 +22,6 @@
  */
 
 /**
- * Main api package for web-resources.
+ * Internal package. This package should not be used directly.
  */
-package com.github.sdorra;
+package com.github.sdorra.webresources.internal;

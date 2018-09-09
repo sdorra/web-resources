@@ -20,13 +20,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra.internal;
+package com.github.sdorra.webresources.internal;
 
-import com.github.sdorra.ContentTypeResolver;
+import com.github.sdorra.webresources.ContentTypeResolver;
+import org.apache.tika.Tika;
 
-class JDKContentTypeResolverTest extends ContentTypeResolverTestBase {
+/**
+ * {@link ContentTypeResolver} which apache tika.
+ *
+ * @see <a href="https://tika.apache.org/">Apache Tika</a>
+ */
+public class TikaContentTypeResolver extends ContentTypeResolver {
+
+    private final Tika tika = new Tika();
+
     @Override
-    ContentTypeResolver create() {
-        return new JDKContentTypeResolver();
+    public String detect(String name) {
+        return tika.detect(name);
     }
 }

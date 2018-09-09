@@ -20,31 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdorra;
+package com.github.sdorra.webresources;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+/**
+ * A throwing supplier is a functional interface which consists on a single get function which is able to throw an
+ * exception.
+ *
+ * @param <T> type of return value
+ * @param <E> type of exception
+ */
+@FunctionalInterface
+public interface ThrowingSupplier<T, E extends Throwable> {
 
-final class Streams {
-
-    private Streams() {
-
-    }
-
-    static void copy(InputStream source, OutputStream sink) throws IOException {
-        byte[] buf = new byte[8192];
-        int n;
-        while ((n = source.read(buf)) > 0) {
-            sink.write(buf, 0, n);
-        }
-    }
-
-    static String toString(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Streams.copy(inputStream, output);
-        return output.toString("UTF-8");
-    }
+    /**
+     * Gets the the result.
+     *
+     * @return result
+     *
+     * @throws E could be thrown by the implementation
+     */
+    T get() throws E;
 
 }

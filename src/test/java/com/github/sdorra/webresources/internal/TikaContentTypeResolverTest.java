@@ -20,21 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.github.sdorra.webresources.internal;
 
-package com.github.sdorra.internal;
+import com.github.sdorra.webresources.ContentTypeResolver;
 
-import com.github.sdorra.ContentTypeResolver;
-
-import java.net.FileNameMap;
-import java.net.URLConnection;
-
-/**
- * {@link ContentTypeResolver} which uses {@link FileNameMap} of the jdk.
- */
-public class JDKContentTypeResolver extends ContentTypeResolver {
+class TikaContentTypeResolverTest extends ContentTypeResolverTestBase {
     @Override
-    public String detect(String name) {
-        FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        return fileNameMap.getContentTypeFor(name);
+    ContentTypeResolver create() {
+        return new TikaContentTypeResolver();
     }
 }
