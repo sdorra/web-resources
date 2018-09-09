@@ -1,4 +1,4 @@
-# Spotter
+# Web-Resources
 
 [![Build Status](https://travis-ci.org/sdorra/web-resources.svg?branch=master)](https://travis-ci.org/sdorra/web-resources)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.sdorra/web-resources.svg)](https://search.maven.org/search?q=a:web-resources%20g:com.github.sdorra)
