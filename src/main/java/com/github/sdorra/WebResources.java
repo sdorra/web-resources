@@ -62,7 +62,7 @@ public final class WebResources {
                 .build();
     }
 
-    public static Builder builder(String name, ContentProvider contentProvider) {
+    public static Builder builder(String name, Provider<InputStream, IOException> contentProvider) {
         return new Builder(name, contentProvider);
     }
 
@@ -81,7 +81,7 @@ public final class WebResources {
 
         private final WebResourceImpl resource;
 
-        private Builder(String name, ContentProvider contentProvider) {
+        private Builder(String name, Provider<InputStream, IOException> contentProvider) {
             this.resource = new WebResourceImpl(name, contentProvider);
         }
 
@@ -123,15 +123,15 @@ public final class WebResources {
     private static class WebResourceImpl implements WebResource {
 
         private final String name;
-        private final ContentProvider provider;
+        private final Provider<InputStream, IOException> contentProvider;
         private Long contentLength;
         private String contentType;
         private String etag;
         private Instant lastModifiedDate;
 
-        private WebResourceImpl(String name, ContentProvider provider) {
+        private WebResourceImpl(String name, Provider<InputStream, IOException> contentProvider) {
             this.name = name;
-            this.provider = provider;
+            this.contentProvider = contentProvider;
         }
 
         @Override
@@ -141,7 +141,7 @@ public final class WebResources {
 
         @Override
         public InputStream getContent() throws IOException {
-            return provider.get();
+            return contentProvider.get();
         }
 
         @Override
