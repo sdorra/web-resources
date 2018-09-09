@@ -22,9 +22,23 @@
  */
 package com.github.sdorra;
 
+/**
+ * A throwing supplier is a functional interface which consists on a single get function which is able to throw an
+ * exception.
+ *
+ * @param <T> type of return value
+ * @param <E> type of exception
+ */
 @FunctionalInterface
-public interface Provider<T, E extends Throwable> {
+public interface ThrowingSupplier<T, E extends Throwable> {
 
+    /**
+     * Gets the the result.
+     *
+     * @return result
+     *
+     * @throws E could be thrown by the implementation
+     */
     T get() throws E;
 
 }

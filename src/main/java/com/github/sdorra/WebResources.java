@@ -118,12 +118,12 @@ public final class WebResources {
      * Creates builder for a {@link WebResource}.
      *
      * @param name name of the resource
-     * @param contentProvider content provider
+     * @param contentThrowingSupplier content provider
      *
      * @return web resource builder
      */
-    public static Builder builder(String name, Provider<InputStream, IOException> contentProvider) {
-        return new Builder(name, contentProvider);
+    public static Builder builder(String name, ThrowingSupplier<InputStream, IOException> contentThrowingSupplier) {
+        return new Builder(name, contentThrowingSupplier);
     }
 
     /**
@@ -154,8 +154,8 @@ public final class WebResources {
 
         private final WebResourceImpl resource;
 
-        private Builder(String name, Provider<InputStream, IOException> contentProvider) {
-            this.resource = new WebResourceImpl(name, contentProvider);
+        private Builder(String name, ThrowingSupplier<InputStream, IOException> contentSupplier) {
+            this.resource = new WebResourceImpl(name, contentSupplier);
         }
 
         /**
@@ -236,15 +236,15 @@ public final class WebResources {
     private static class WebResourceImpl implements WebResource {
 
         private final String name;
-        private final Provider<InputStream, IOException> contentProvider;
+        private final ThrowingSupplier<InputStream, IOException> contentSupplier;
         private Long contentLength;
         private String contentType;
         private String etag;
         private Instant lastModifiedDate;
 
-        private WebResourceImpl(String name, Provider<InputStream, IOException> contentProvider) {
+        private WebResourceImpl(String name, ThrowingSupplier<InputStream, IOException> contentSupplier) {
             this.name = name;
-            this.contentProvider = contentProvider;
+            this.contentSupplier = contentSupplier;
         }
 
         @Override
@@ -254,7 +254,7 @@ public final class WebResources {
 
         @Override
         public InputStream getContent() throws IOException {
-            return contentProvider.get();
+            return contentSupplier.get();
         }
 
         @Override
