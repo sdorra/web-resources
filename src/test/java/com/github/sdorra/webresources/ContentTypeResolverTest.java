@@ -22,7 +22,6 @@
  */
 package com.github.sdorra.webresources;
 
-import com.github.sdorra.webresources.ContentTypeResolver;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
