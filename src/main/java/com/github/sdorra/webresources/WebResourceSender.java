@@ -233,7 +233,7 @@ public final class WebResourceSender {
             // If-None-Match header should contain "*" or ETag. If so, then return 304.
             String ifNoneMatch = request.getHeader("If-None-Match");
             Optional<String> eTag = resource.getETag();
-            if (ifNoneMatch != null && matches(ifNoneMatch, eTag)) {
+            if (matches(ifNoneMatch, eTag)) {
                 response.setHeader("ETag", eTag.get()); // Required in 304.
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 return;
