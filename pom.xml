@@ -29,7 +29,7 @@
 
     <groupId>com.github.sdorra</groupId>
     <artifactId>web-resources</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <name>Web Resources</name>
     <url>https://github.com/sdorra/web-resources</url>
     <description>Sending web resources the right way</description>

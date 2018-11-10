@@ -34,7 +34,7 @@ public abstract class ContentTypeResolver {
     static {
         if (exists("com.github.sdorra.spotter.ContentTypes")) {
             instance = create("com.github.sdorra.webresources.internal.SpotterContentTypeResolver");
-        } else if (exists("")) {
+        } else if (exists("org.apache.tika.Tika")) {
             instance = create("com.github.sdorra.webresources.internal.TikaContentTypeResolver");
         } else {
             instance = create("com.github.sdorra.webresources.internal.JDKContentTypeResolver");

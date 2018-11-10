@@ -299,7 +299,8 @@ public final class WebResourceSender {
         }
 
         private boolean isContentCompressable() {
-            return !contentType.startsWith("image") && !contentType.startsWith("video");
+            return "image/svg+xml".equals(contentType)
+                    || !contentType.startsWith("image") && !contentType.startsWith("video");
         }
 
         private boolean accepts(String acceptHeader, String toAccept) {

@@ -230,25 +230,6 @@ class WebResourceSenderTest {
     }
 
     @Test
-    void testGZipCompression() throws IOException {
-        when(request.getHeader("Accept-Encoding")).thenReturn("gzip");
-        when(resource.getContent()).thenReturn(inputStream("hello"));
-
-        try (CapturingOutputStream output = new CapturingOutputStream()) {
-            when(response.getOutputStream()).thenReturn(output);
-
-            WebResourceSender.create()
-                    .withGZIP()
-                    .resource(resource)
-                    .send(request, response);
-
-            verify(response).setHeader("Content-Encoding", "gzip");
-            String content = readGZIP(output.buffer.toByteArray());
-            assertThat(content).isEqualTo("hello");
-        }
-    }
-
-    @Test
     void testDisabledGZipCompressionForSmallFiles() throws IOException {
         when(request.getHeader("Accept-Encoding")).thenReturn("gzip");
         when(resource.getContentLength()).thenReturn(Optional.of(5L));
@@ -265,6 +246,47 @@ class WebResourceSenderTest {
 
             verify(response, never()).setHeader("Content-Encoding", "gzip");
             assertThat(output.getValue()).isEqualTo("hello");
+        }
+    }
+
+    @Test
+    void testGZipCompressionOnText() throws IOException {
+        verifyCompressed("text/plain");
+    }
+
+    @Test
+    void testGZipCompressionOnCSS() throws IOException {
+        verifyCompressed("text/css");
+    }
+
+    @Test
+    void testGZipCompressionOnJavaScript() throws IOException {
+        verifyCompressed("application/javascript");
+    }
+
+    @Test
+    void testGZipCompressionOnSvg() throws IOException {
+        verifyCompressed("image/svg+xml");
+    }
+
+    private void verifyCompressed(String contentType) throws IOException {
+        when(request.getHeader("Accept-Encoding")).thenReturn("gzip");
+        when(resource.getContentType()).thenReturn(Optional.of(contentType));
+        when(resource.getContent()).thenReturn(inputStream("hello"));
+        when(resource.getContentLength()).thenReturn(Optional.of(42L));
+
+        try (CapturingOutputStream output = new CapturingOutputStream()) {
+            when(response.getOutputStream()).thenReturn(output);
+
+            WebResourceSender.create()
+                    .withGZIP()
+                    .resource(resource)
+                    .send(request, response);
+
+            verify(response, never()).setHeader("Content-Length", "42");
+            verify(response).setHeader("Content-Encoding", "gzip");
+            String content = readGZIP(output.buffer.toByteArray());
+            assertThat(content).isEqualTo("hello");
         }
     }
 
