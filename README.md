@@ -26,7 +26,7 @@ E.g. for maven:
 <dependency>
     <groupId>com.github.sdorra</groupId>
     <artifactId>web-resource</artifactId>
-    <version>1.0.1</version>
+    <version>x.y.z</version>
 </dependency>
 ```
 
