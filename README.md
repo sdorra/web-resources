@@ -14,7 +14,8 @@ It does the following things for you:
 * Sets Content-Disposition header
 * Head request without content
 * Optional GZIP compression
-* Optional handling Expires header 
+* Optional handling Expires header
+* Optional handling Cache-Control header
 
 ## Usage
 
