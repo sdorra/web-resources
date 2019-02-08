@@ -61,4 +61,13 @@ class CacheControlTest {
         assertThat(cacheControler).isEqualTo(expected);
     }
 
+    @Test
+    void shouldBeEmpty() {
+        assertThat(CacheControl.create().isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldBeNotEmpty() {
+        assertThat(CacheControl.create().privateCache().isEmpty()).isFalse();
+    }
 }

@@ -433,15 +433,52 @@ class WebResourceSenderTest {
                     .resource(resource)
                     .send(request, response);
 
+            assertHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+
+        @Test
+        void testCacheControlWithoutCacheControl() throws IOException {
+            WebResourceSender.create()
+                    .resource(resource)
+                    .send(request, response);
+
+            assertHeaderIsAbsent("Cache-Control");
+        }
+
+        @Test
+        void testCacheControlWithEmptyCacheControl() throws IOException {
+            WebResourceSender.create()
+                    .withCacheControl(CacheControl.create())
+                    .resource(resource)
+                    .send(request, response);
+
+            assertHeaderIsAbsent("Cache-Control");
+        }
+
+        @Test
+        void testCacheControlWithNullCacheControl() {
+            assertThrows(IllegalArgumentException.class, () -> WebResourceSender.create().withCacheControl(null));
+        }
+
+        private void assertHeader(String name, String expected) {
             ArgumentCaptor<String> nameCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<String> valueCaptor = ArgumentCaptor.forClass(String.class);
+
             verify(response, atLeastOnce()).setHeader(nameCaptor.capture(), valueCaptor.capture());
 
-            int index = nameCaptor.getAllValues().indexOf("Cache-Control");
+            int index = nameCaptor.getAllValues().indexOf(name);
             assertThat(index).isGreaterThan(0);
 
-            String cacheControl = valueCaptor.getAllValues().get(index);
-            assertThat(cacheControl).isEqualTo("no-cache, no-store, must-revalidate");
+            String value = valueCaptor.getAllValues().get(index);
+            assertThat(value).isEqualTo(expected);
+        }
+
+        private void assertHeaderIsAbsent(String name) {
+            ArgumentCaptor<String> nameCaptor = ArgumentCaptor.forClass(String.class);
+            verify(response, atLeastOnce()).setHeader(nameCaptor.capture(), anyString());
+
+            int index = nameCaptor.getAllValues().indexOf(name);
+            assertThat(index).isEqualTo(-1);
         }
 
         @Test

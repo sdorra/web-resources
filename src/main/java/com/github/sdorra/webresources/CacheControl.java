@@ -154,12 +154,21 @@ public final class CacheControl {
         return value.toString();
     }
 
+    /**
+     * Returns {@code true} if no cache-control was added.
+     *
+     * @return {@code true} if it is empty
+     */
+    boolean isEmpty() {
+        return value.length() == 0;
+    }
+
     private CacheControl append(String cacheControl, long duration, TimeUnit unit) {
         return append( cacheControl + "=" + unit.toSeconds(duration) );
     }
 
     private CacheControl append(String cacheControl) {
-        if (value.length() > 0) {
+        if (!isEmpty()) {
             value.append(", ");
         }
         value.append(cacheControl);

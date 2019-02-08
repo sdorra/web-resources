@@ -120,14 +120,20 @@ public final class WebResourceSender {
     }
 
     /**
-     * Applies the given cache control as header to the response.
+     * Applies the given cache control as header to the response. If the CacheControl is empty, no Cache-Control header
+     * is applied to the response.
      *
      * @param cacheControl cache control
      *
      * @return {@code this}
      */
     public WebResourceSender withCacheControl(CacheControl cacheControl) {
-        this.cacheControl = cacheControl.build();
+        if (cacheControl == null) {
+            throw new IllegalArgumentException("cache control is required");
+        }
+        if (!cacheControl.isEmpty()) {
+            this.cacheControl = cacheControl.build();
+        }
         return this;
     }
 
