@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/sdorra/web-resources.svg?branch=master)](https://travis-ci.org/sdorra/web-resources)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.sdorra/web-resources.svg)](https://search.maven.org/search?q=a:web-resources%20g:com.github.sdorra)
 [![Quality Gates](https://sonarcloud.io/api/project_badges/measure?project=com.github.sdorra%3Aweb-resources&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.sdorra%3Aweb-resources)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.github.sdorra%3Aspotter&metric=coverage)](https://sonarcloud.io/dashboard?id=com.github.sdorra%3Aspotter)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.github.sdorra%3Aweb-resources&metric=coverage)](https://sonarcloud.io/dashboard?id=com.github.sdorra%3Aweb-resources)
 
 The web-resources library is usable for serving files over http. 
 It does the following things for you:
