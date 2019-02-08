@@ -32,6 +32,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.mockito.verification.VerificationMode;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -423,6 +424,24 @@ class WebResourceSenderTest {
                     .send(request, response);
 
             verify(response).setHeader("Content-Disposition", "inline;filename=\"hello.png\"");
+        }
+
+        @Test
+        void testCacheControl() throws IOException {
+            WebResourceSender.create()
+                    .withCacheControl(CacheControl.create().noCache().noStore().mustRevalidate())
+                    .resource(resource)
+                    .send(request, response);
+
+            ArgumentCaptor<String> nameCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> valueCaptor = ArgumentCaptor.forClass(String.class);
+            verify(response, atLeastOnce()).setHeader(nameCaptor.capture(), valueCaptor.capture());
+
+            int index = nameCaptor.getAllValues().indexOf("Cache-Control");
+            assertThat(index).isGreaterThan(0);
+
+            String cacheControl = valueCaptor.getAllValues().get(index);
+            assertThat(cacheControl).isEqualTo("no-cache, no-store, must-revalidate");
         }
 
         @Test

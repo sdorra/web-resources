@@ -47,6 +47,7 @@ public final class WebResourceSender {
     private boolean gzip = false;
     private long gzipMinLength = -1;
     private int bufferSize = BUFFER_SIZE;
+    private String cacheControl = null;
     private long expires = -1;
 
     private WebResourceSender(){}
@@ -115,6 +116,18 @@ public final class WebResourceSender {
      */
     public WebResourceSender withGZIPMinLength(long minLength) {
         this.gzipMinLength = minLength;
+        return this;
+    }
+
+    /**
+     * Applies the given cache control as header to the response.
+     *
+     * @param cacheControl cache control
+     *
+     * @return {@code this}
+     */
+    public WebResourceSender withCacheControl(CacheControl cacheControl) {
+        this.cacheControl = cacheControl.build();
         return this;
     }
 
@@ -369,6 +382,10 @@ public final class WebResourceSender {
             response.setHeader("Content-Type", contentType);
             setDateHeader(response, "Last-Modified", resource.getLastModifiedDate());
             setHeader(response, "ETag", resource.getETag());
+
+            if (cacheControl != null) {
+                response.setHeader("Cache-Control", cacheControl);
+            }
 
             if (expires > 0) {
                 response.setDateHeader("Expires", System.currentTimeMillis() + expires);
