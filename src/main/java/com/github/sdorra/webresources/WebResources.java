@@ -143,8 +143,8 @@ public final class WebResources {
         return etag(name, size, lastModified);
     }
 
-    private static String etag(String name, long size, long lastModifid) {
-        return String.format("%s_%s_%s", name, size, lastModifid);
+    private static String etag(String name, long size, long lastModified) {
+        return String.format("W/\"%s_%s_%s\"", name, size, lastModified);
     }
 
     /**
