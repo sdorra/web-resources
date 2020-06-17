@@ -32,6 +32,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -81,12 +82,24 @@ class WebResourcesTest {
         URL url = new URL(String.format("jar:file:%s!/%s", jarPath.toString(), "test.txt"));
         WebResource resource = WebResources.of(url);
 
-
         assertThat(resource.getContentType()).contains("text/plain");
         assertThat(resource.getContentLength()).contains(Files.size(path));
         assertThat(Streams.toString(resource.getContent())).isEqualTo("awesome");
-        assertThat(resource.getETag()).contains(WebResources.etag(path));
-        assertThat(resource.getLastModifiedDate()).contains(Files.getLastModifiedTime(jarPath).toInstant());
+        assertThat(resource.getETag().isPresent()).isTrue();
+        long lastModified = url.openConnection().getLastModified();
+        assertThat(resource.getLastModifiedDate()).contains(Instant.ofEpochMilli(lastModified));
+    }
+
+    @Test
+    void shouldCreateWeakEtag(@TempDirectory.TempDir Path tempDir) throws IOException {
+        Path path = createSamplePath(tempDir);
+
+        WebResource resource = WebResources.of(path);
+
+        assertThat(resource.getETag().isPresent()).isTrue();
+        String etag = resource.getETag().get();
+        assertThat(etag).startsWith("W/\"");
+        assertThat(etag).endsWith("\"");
     }
 
 
