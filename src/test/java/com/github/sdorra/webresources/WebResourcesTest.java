@@ -32,6 +32,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -84,8 +85,9 @@ class WebResourcesTest {
         assertThat(resource.getContentType()).contains("text/plain");
         assertThat(resource.getContentLength()).contains(Files.size(path));
         assertThat(Streams.toString(resource.getContent())).isEqualTo("awesome");
-        assertThat(resource.getETag()).contains(WebResources.etag(path));
-        assertThat(resource.getLastModifiedDate()).contains(Files.getLastModifiedTime(jarPath).toInstant());
+        assertThat(resource.getETag().isPresent()).isTrue();
+        long lastModified = url.openConnection().getLastModified();
+        assertThat(resource.getLastModifiedDate()).contains(Instant.ofEpochMilli(lastModified));
     }
 
     @Test
