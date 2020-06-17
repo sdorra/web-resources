@@ -26,13 +26,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.mockito.verification.VerificationMode;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
-@ExtendWith({MockitoExtension.class, TempDirectory.class})
+@ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class WebResourceSenderTest {
 
@@ -513,24 +512,24 @@ class WebResourceSenderTest {
     }
 
     @Test
-    void testWithPath(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void testWithPath(@TempDir Path tempDir) throws IOException {
         Path path = createSample(tempDir);
         verifyPath(WebResourceSender.create().resource(path), path);
     }
 
     @Test
-    void testWithFile(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void testWithFile(@TempDir Path tempDir) throws IOException {
         Path path = createSample(tempDir);
         verifyPath(WebResourceSender.create().resource(path.toFile()), path);
     }
 
     @Test
-    void testWithURL(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void testWithURL(@TempDir Path tempDir) throws IOException {
         Path path = createSample(tempDir);
         verifyPath(WebResourceSender.create().resource(path.toUri().toURL()), path);
     }
 
-    private Path createSample(@TempDirectory.TempDir Path tempDir) throws IOException {
+    private Path createSample(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("test.txt");
         Files.write(path, "hello".getBytes(StandardCharsets.UTF_8));
         return path;

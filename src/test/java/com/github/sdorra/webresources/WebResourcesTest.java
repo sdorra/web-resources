@@ -23,8 +23,7 @@
 package com.github.sdorra.webresources;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,11 +37,10 @@ import java.util.jar.JarOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(TempDirectory.class)
 class WebResourcesTest {
 
     @Test
-    void testOfPath(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void testOfPath(@TempDir Path tempDir) throws IOException {
         Path path = createSamplePath(tempDir);
 
         WebResource resource = WebResources.of(path);
@@ -50,7 +48,7 @@ class WebResourcesTest {
     }
 
     @Test
-    void testOfFile(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void testOfFile(@TempDir Path tempDir) throws IOException {
         Path path = createSamplePath(tempDir);
 
         WebResource resource = WebResources.of(path.toFile());
@@ -58,7 +56,7 @@ class WebResourcesTest {
     }
 
     @Test
-    void testOfFileURL(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void testOfFileURL(@TempDir Path tempDir) throws IOException {
         Path path = createSamplePath(tempDir);
 
         WebResource resource = WebResources.of(path.toUri().toURL());
@@ -66,7 +64,7 @@ class WebResourcesTest {
     }
 
     @Test
-    void testOfJarURL(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void testOfJarURL(@TempDir Path tempDir) throws IOException {
         Path path = createSamplePath(tempDir);
         Path jarPath = tempDir.resolve("test.jar");
 
@@ -91,7 +89,7 @@ class WebResourcesTest {
     }
 
     @Test
-    void shouldCreateWeakEtag(@TempDirectory.TempDir Path tempDir) throws IOException {
+    void shouldCreateWeakEtag(@TempDir Path tempDir) throws IOException {
         Path path = createSamplePath(tempDir);
 
         WebResource resource = WebResources.of(path);
@@ -112,7 +110,7 @@ class WebResourcesTest {
         assertThat(resource.getETag()).contains(WebResources.etag(path));
     }
 
-    private Path createSamplePath(@TempDirectory.TempDir Path tempDir) throws IOException {
+    private Path createSamplePath(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("test.txt");
         Files.write(path, "awesome".getBytes(StandardCharsets.UTF_8));
         return path;
