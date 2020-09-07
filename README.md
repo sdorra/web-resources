@@ -26,7 +26,7 @@ E.g. for maven:
 ```xml
 <dependency>
     <groupId>com.github.sdorra</groupId>
-    <artifactId>web-resource</artifactId>
+    <artifactId>web-resources</artifactId>
     <version>x.y.z</version>
 </dependency>
 ```
